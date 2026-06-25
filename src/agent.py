@@ -12,7 +12,10 @@ from livekit.agents import (
     inference,
     room_io,
 )
-from livekit.plugins import ai_coustics
+from livekit.plugins import (
+    ai_coustics,
+    anam,
+)
 
 logger = logging.getLogger("agent")
 
@@ -91,7 +94,7 @@ class Assistant(Agent):
 server = AgentServer()
 
 
-@server.rtc_session(agent_name="my-agent")
+@server.rtc_session(agent_name="tg-agent")
 async def my_agent(ctx: JobContext):
     # Logging setup
     # Add any other context you want in all log entries here
@@ -107,7 +110,7 @@ async def my_agent(ctx: JobContext):
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=inference.TTS(
-            model="cartesia/sonic-3", voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+            model="cartesia/sonic-3", voice="a167e0f3-df7e-4d52-a9c3-f949145efdab"
         ),
         # The LiveKit turn detector determines when the user is done speaking and the agent should respond.
         # TurnDetector is an end-of-turn model that listens to the user's audio directly, combining
@@ -122,6 +125,17 @@ async def my_agent(ctx: JobContext):
         preemptive_generation=True,
     )
 
+    # # Add a virtual avatar to the session, if desired
+    avatar = anam.AvatarSession(
+      persona_config=anam.PersonaConfig(
+         name="Zvi",  # Name of the avatar to use.
+         avatarId="a3f95f11-a2ed-4e58-a8e9-00747562ce3a",  # ID of the avatar to use. See "Avatar setup" for details.
+      ),
+    )
+
+    # Start the avatar and wait for it to join
+    await avatar.start(session, room=ctx.room)
+
     # Start the session, which initializes the voice pipeline and warms up the models
     await session.start(
         agent=Assistant(),
@@ -134,17 +148,6 @@ async def my_agent(ctx: JobContext):
             ),
         ),
     )
-
-    # # Add a virtual avatar to the session, if desired
-    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
-    # avatar = anam.AvatarSession(
-    #     persona_config=anam.PersonaConfig(
-    #         name="...",
-    #         avatarId="...",  # See https://docs.livekit.io/agents/models/avatar/plugins/anam
-    #     ),
-    # )
-    # # Start the avatar and wait for it to join
-    # await avatar.start(session, room=ctx.room)
 
     # Join the room and connect to the user
     await ctx.connect()
