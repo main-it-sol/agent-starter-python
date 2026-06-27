@@ -106,12 +106,14 @@ async def my_agent(ctx: JobContext):
     session = AgentSession(
         # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
         # See all available models at https://docs.livekit.io/agents/models/stt/
-        stt=inference.STT(model="deepgram/nova-3", language="multi"),
+        stt=inference.STT(model="cartesia/ink-whisper", language="he"),
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
+        
         tts=inference.TTS(
-            model="cartesia/sonic-3", voice="a167e0f3-df7e-4d52-a9c3-f949145efdab"
+            model="inworld/inworld-tts-2", voice="Oren"
         ),
+        
         # The LiveKit turn detector determines when the user is done speaking and the agent should respond.
         # TurnDetector is an end-of-turn model that listens to the user's audio directly, combining
         # semantic understanding with acoustic cues (intonation, pitch, rhythm) for state-of-the-art accuracy.
